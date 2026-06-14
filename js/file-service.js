@@ -409,6 +409,8 @@
       zipPanel,
       zipFileNameLabel,
       zipFileList,
+      getTabs,
+      getMaxTabs,
       setToolPanelMode
     } = requireDeps();
 
@@ -496,6 +498,62 @@
     } catch (error) {
       console.error(error);
       window.alert("ZIP内ファイルを開けませんでした。");
+    }
+  }
+
+  async function openAllZipEntriesAsTabs() {
+    const {
+      openEncodingSelect,
+      getTabs,
+      getMaxTabs,
+      createTab,
+      renderPreview,
+      renderCsvPreview,
+      getViewMode,
+      focusEditor
+    } = requireDeps();
+
+    if (!currentZipEntries.length) {
+      window.alert("一括展開できるテキスト系ファイルがありません。");
+      return;
+    }
+
+    const availableCount = getMaxTabs() - getTabs().length;
+
+    if (currentZipEntries.length > availableCount) {
+      window.alert(`タブ上限を超えるため一括展開できません。空き: ${availableCount} / 対象: ${currentZipEntries.length}`);
+      return;
+    }
+
+    const selectedEncoding = openEncodingSelect.value;
+
+    try {
+      for (const item of currentZipEntries) {
+        const uint8Array = await item.entry.async("uint8array");
+        const decoder = new TextDecoder(selectedEncoding);
+        const text = decoder.decode(uint8Array);
+
+        createTab({
+          fileName: item.path,
+          text,
+          encoding: selectedEncoding,
+          isDirty: false,
+          saveTarget: null
+        });
+      }
+
+      const viewMode = getViewMode();
+
+      if (viewMode === "preview") {
+        renderPreview();
+      } else if (viewMode === "csv") {
+        renderCsvPreview();
+      } else {
+        focusEditor();
+      }
+    } catch (error) {
+      console.error(error);
+      window.alert("ZIP内ファイルの一括展開に失敗しました。");
     }
   }
 
@@ -629,6 +687,7 @@
     openZipFile,
     readSelectedZipFile,
     saveTabsAsZip,
+    openAllZipEntriesAsTabs,
     closeZipPanel
   };
 })();

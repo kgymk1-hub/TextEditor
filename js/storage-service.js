@@ -2,6 +2,7 @@
   const BACKUP_STORAGE_KEY = "pocketTextEditorTabsBackup";
   const THEME_STORAGE_KEY = "pocketTextEditorTheme";
   const ENCODING_SETTINGS_STORAGE_KEY = "pocketTextEditorEncodingSettings";
+  const APP_SETTINGS_STORAGE_KEY = "pocketTextEditorAppSettings";
 
   function saveTabsBackup(backupData) {
     try {
@@ -87,13 +88,50 @@
     }
   }
 
+  function loadAppSettings() {
+    try {
+      const rawData = localStorage.getItem(APP_SETTINGS_STORAGE_KEY);
+      const settings = rawData ? JSON.parse(rawData) : {};
+
+      return {
+        csvFirstRowHeader: settings.csvFirstRowHeader !== false,
+        linkedPreviewEnabled: settings.linkedPreviewEnabled === true,
+        fontSize: Number(settings.fontSize) || 15,
+        wordWrap: settings.wordWrap !== false,
+        maxTabs: Number(settings.maxTabs) === 10 ? 10 : 5
+      };
+    } catch (error) {
+      console.warn("アプリ設定の読み込みに失敗しました。", error);
+
+      return {
+        csvFirstRowHeader: true,
+        linkedPreviewEnabled: false,
+        fontSize: 15,
+        wordWrap: true,
+        maxTabs: 5
+      };
+    }
+  }
+
+  function saveAppSettings(settings) {
+    try {
+      localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+      return true;
+    } catch (error) {
+      console.warn("アプリ設定の保存に失敗しました。", error);
+      return false;
+    }
+  }
+
   window.AppStorage = {
     saveTabsBackup,
     loadTabsBackup,
     loadTheme,
     saveTheme,
     loadEncodingSettings,
-    saveEncodingSettings
+    saveEncodingSettings,
+    loadAppSettings,
+    saveAppSettings
   };
 })();
 

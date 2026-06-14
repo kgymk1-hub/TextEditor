@@ -50,12 +50,12 @@
       <button id="newButton" type="button">新規</button>
       <button id="openButton" type="button">開く</button>
       <button id="saveButton" type="button">保存</button>
-      <button id="saveAsButton" type="button">別名保存</button>
+      <button id="saveAsButton" type="button">DL保存</button>
     </nav>
 
     <section class="tool-togglebar" aria-label="ツール切替">
       <button id="toggleSearchPanelButton" type="button">検索</button>
-      <button id="toggleEncodingPanelButton" type="button">文字コード</button>
+      <button id="toggleEncodingPanelButton" type="button">設定</button>
       <button id="toggleZipPanelButton" type="button">ZIP</button>
     </section>
 
@@ -99,11 +99,39 @@
             <option value="utf-8-bom">UTF-8 BOM</option>
           </select>
         </section>
+
+        <section class="settings-panel" aria-label="アプリ設定">
+          <label>
+            <input id="csvHeaderCheckbox" type="checkbox" />
+            CSV 1行目ヘッダー
+          </label>
+          <label>
+            <input id="linkedPreviewCheckbox" type="checkbox" />
+            連携プレビュー（JS実行許可）
+          </label>
+          <label for="fontSizeSelect">文字サイズ</label>
+          <select id="fontSizeSelect">
+            <option value="14">小</option>
+            <option value="15">標準</option>
+            <option value="17">大</option>
+          </select>
+          <label>
+            <input id="wordWrapCheckbox" type="checkbox" />
+            折り返し
+          </label>
+          <label for="maxTabsSelect">タブ上限</label>
+          <select id="maxTabsSelect">
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+          <p class="save-policy-note">保存先を保持できるのは「開く」で開いた既存ファイルのみです。DL保存は保存先を変更しません。</p>
+        </section>
       </div>
 
       <div id="zipToolPanel" class="tool-panel-section">
         <section class="zip-actionbar" aria-label="ZIP操作">
           <button id="openZipButton" type="button">ZIP開く</button>
+          <button id="extractAllZipButton" type="button">一括展開</button>
           <button id="saveZipButton" type="button">ZIP保存</button>
         </section>
 
@@ -119,10 +147,10 @@
     </section>
 
     <section class="viewbar" aria-label="表示切替">
-      <button id="editModeButton" type="button">編集</button>
+      <button id="editModeButton" type="button">✎</button>
       <button id="previewModeButton" type="button">HTML</button>
       <button id="csvModeButton" type="button">CSV</button>
-      <button id="refreshPreviewButton" type="button">更新</button>
+      <button id="refreshPreviewButton" type="button">⟳</button>
     </section>
 
     <input
@@ -173,6 +201,7 @@
   <script src="js/storage-service.js"></script>
   <script src="js/tabs.js"></script>
   <script src="js/editor.js"></script>
+  <script src="js/preview-service.js"></script>
   <script src="js/file-service.js"></script>
   <script src="js/app.js"></script>
 

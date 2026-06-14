@@ -1,7 +1,7 @@
 {
-  "name": "ポケットテキストエディタ",
-  "short_name": "TextEditor",
-  "description": "Androidスマホで使えるシンプルなPWAテキストエディタです。",
+  "name": "Pocket Text Editor",
+  "short_name": "PocketEditor",
+  "description": "AndroidスマホとPCで使えるPWAテキストエディタです。",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -14,5 +14,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "orientation": "any"
 }
