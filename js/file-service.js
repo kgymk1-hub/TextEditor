@@ -52,7 +52,7 @@
       return;
     }
 
-    if (AppEnv.canUseFileSystemAccess) {
+    if (AppEnv.canUseOpenFilePicker || AppEnv.canUseFileSystemAccess) {
       try {
         const handles = await window.showOpenFilePicker({
           multiple: false,
@@ -187,7 +187,7 @@
 
   async function saveToFileSystemAccessTarget(tab) {
     if (
-      !AppEnv.canUseFileSystemAccess ||
+      (!AppEnv.canUseOpenFilePicker && !AppEnv.canUseFileSystemAccess) ||
       !tab.saveTarget ||
       tab.saveTarget.type !== "filesystem-access" ||
       !tab.saveTarget.handle
@@ -264,12 +264,19 @@
       }
     }
 
-    await saveFileAs();
+    const suggestedName = getSafeFileName(activeTab);
+    downloadTextFile(suggestedName, activeTab.text || "");
+
+    activeTab.isDirty = false;
+    activeTab.updatedAt = new Date().toISOString();
+
+    updateDisplay();
+    saveBackup();
   }
 
   function getSafeFileName(tab) {
     if (!tab || !tab.fileName || tab.fileName === "無題") {
-      return "untitled.txt";
+      return "pocket-text.txt";
     }
 
     if (!/\.[^./\\]+$/.test(tab.fileName)) {
@@ -295,43 +302,8 @@
       return;
     }
 
-    const text = activeTab.text;
+    const text = activeTab.text || "";
     const suggestedName = getSafeFileName(activeTab);
-
-    if (AppEnv.canUseFileSystemAccess) {
-      try {
-        const handle = await window.showSaveFilePicker({
-          suggestedName
-        });
-
-        await writeTextToFileHandle(handle, text);
-
-        const savedName = handle.name || suggestedName;
-
-        activeTab.saveTarget = {
-          type: "filesystem-access",
-          handle,
-          name: savedName
-        };
-
-        activeTab.fileName = savedName;
-        activeTab.isDirty = false;
-        activeTab.updatedAt = new Date().toISOString();
-
-        updateDisplay();
-        saveBackup();
-        return;
-      } catch (error) {
-        if (error.name === "AbortError") {
-          return;
-        }
-
-        console.warn(
-          "File System Access APIでの保存に失敗しました。ダウンロード保存に切り替えます。",
-          error
-        );
-      }
-    }
 
     downloadTextFile(suggestedName, text);
 

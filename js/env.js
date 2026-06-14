@@ -18,10 +18,11 @@
   const hasSaveFilePicker =
     "showSaveFilePicker" in window;
 
-  const canUseFileSystemAccess =
+  const canUseOpenFilePicker =
     hasOpenFilePicker &&
-    hasSaveFilePicker &&
     (isSecure || isLocalhost);
+
+  const canUseFileSystemAccess = canUseOpenFilePicker;
 
   const canRegisterServiceWorker =
     "serviceWorker" in navigator &&
@@ -35,6 +36,7 @@
     isCapacitor,
     hasOpenFilePicker,
     hasSaveFilePicker,
+    canUseOpenFilePicker,
     canUseFileSystemAccess,
     canRegisterServiceWorker
   };

@@ -1,4 +1,4 @@
-const CACHE_NAME = "pocket-text-editor-v25";
+const CACHE_NAME = "pocket-text-editor-v26";
 
 const FILES_TO_CACHE = [
   "./",
@@ -61,4 +61,4 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-/* SERVICE_WORKER_MARKER_EDITOR_SPLIT_V25_2026_06_07 */
+/* SERVICE_WORKER_MARKER_EDITOR_SPLIT_V26_2026_06_14 */
