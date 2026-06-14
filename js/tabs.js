@@ -1,5 +1,6 @@
 (function () {
-  const MAX_TABS = 5;
+  const DEFAULT_MAX_TABS = 5;
+  let maxTabs = DEFAULT_MAX_TABS;
 
   let deps = null;
   let tabs = [];
@@ -26,7 +27,7 @@
   }
 
   function getMaxTabs() {
-    return MAX_TABS;
+    return maxTabs;
   }
 
   function getTabs() {
@@ -41,9 +42,13 @@
     return tabs.find((tab) => tab.id === activeTabId) || null;
   }
 
+  function setMaxTabs(value) {
+    maxTabs = Number(value) === 10 ? 10 : DEFAULT_MAX_TABS;
+  }
+
   function canAddTab() {
-    if (tabs.length >= MAX_TABS) {
-      window.alert(`開けるタブは最大${MAX_TABS}個までです。`);
+    if (tabs.length >= maxTabs) {
+      window.alert(`開けるタブは最大${maxTabs}個までです。`);
       return false;
     }
 
@@ -316,6 +321,7 @@
   window.AppTabs = {
     init,
     getMaxTabs,
+    setMaxTabs,
     getTabs,
     getActiveTabId,
     getActiveTab,

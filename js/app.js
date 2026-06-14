@@ -34,6 +34,7 @@ const zipPanel = document.getElementById("zipPanel");
 const zipFileNameLabel = document.getElementById("zipFileNameLabel");
 const zipFileList = document.getElementById("zipFileList");
 const closeZipPanelButton = document.getElementById("closeZipPanelButton");
+const extractAllZipButton = document.getElementById("extractAllZipButton");
 
 const previewFrame = document.getElementById("previewFrame");
 const csvPreview = document.getElementById("csvPreview");
@@ -54,8 +55,11 @@ const saveStatus = document.getElementById("saveStatus");
 const charCount = document.getElementById("charCount");
 const lineCount = document.getElementById("lineCount");
 const encodingLabel = document.getElementById("encodingLabel");
-
-const CSV_PREVIEW_MAX_ROWS = 500;
+const csvHeaderCheckbox = document.getElementById("csvHeaderCheckbox");
+const linkedPreviewCheckbox = document.getElementById("linkedPreviewCheckbox");
+const fontSizeSelect = document.getElementById("fontSizeSelect");
+const wordWrapCheckbox = document.getElementById("wordWrapCheckbox");
+const maxTabsSelect = document.getElementById("maxTabsSelect");
 
 let viewMode = "edit";
 let toolPanelMode = "none";
@@ -271,167 +275,12 @@ function restoreBackupIfNeeded() {
   return true;
 }
 
-function getPreviewHtml() {
-  const activeTab = getActiveTab();
-  const html = activeTab ? activeTab.text : "";
-
-  if (!html) {
-    return `
-      <!DOCTYPE html>
-      <html lang="ja">
-      <head>
-        <meta charset="UTF-8">
-        <style>
-          body {
-            font-family: sans-serif;
-            padding: 16px;
-            color: #374151;
-            background: #ffffff;
-          }
-        </style>
-      </head>
-      <body>
-        <p>プレビューするHTMLがありません。</p>
-      </body>
-      </html>
-    `;
-  }
-
-  return html;
-}
-
 function renderPreview() {
-  syncEditorToActiveTab();
-  previewFrame.srcdoc = getPreviewHtml();
-}
-
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let cell = "";
-  let inQuotes = false;
-
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
-    const nextChar = text[index + 1];
-
-    if (char === '"') {
-      if (inQuotes && nextChar === '"') {
-        cell += '"';
-        index += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (char === "," && !inQuotes) {
-      row.push(cell);
-      cell = "";
-      continue;
-    }
-
-    if ((char === "\n" || char === "\r") && !inQuotes) {
-      if (char === "\r" && nextChar === "\n") {
-        index += 1;
-      }
-
-      row.push(cell);
-      rows.push(row);
-      row = [];
-      cell = "";
-      continue;
-    }
-
-    cell += char;
-  }
-
-  row.push(cell);
-  rows.push(row);
-
-  return rows;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+  AppPreviewService.renderPreview();
 }
 
 function renderCsvPreview() {
-  syncEditorToActiveTab();
-
-  const activeTab = getActiveTab();
-  const text = activeTab ? activeTab.text : "";
-
-  if (!text.trim()) {
-    csvPreview.innerHTML = `<p class="csv-message">CSVとして表示する内容がありません。</p>`;
-    return;
-  }
-
-  let rows;
-
-  try {
-    rows = parseCsv(text);
-  } catch (error) {
-    console.error(error);
-    csvPreview.innerHTML = `<p class="csv-message">CSVとして表示できませんでした。</p>`;
-    return;
-  }
-
-  if (!rows.length) {
-    csvPreview.innerHTML = `<p class="csv-message">CSVとして表示する内容がありません。</p>`;
-    return;
-  }
-
-  const limitedRows = rows.slice(0, CSV_PREVIEW_MAX_ROWS);
-  const isLimited = rows.length > CSV_PREVIEW_MAX_ROWS;
-  const maxColumns = Math.max(...limitedRows.map((row) => row.length));
-
-  const headerRow = limitedRows[0] || [];
-  const bodyRows = limitedRows.slice(1);
-
-  let html = "";
-
-  if (isLimited) {
-    html += `<p class="csv-message">先頭${CSV_PREVIEW_MAX_ROWS}行のみ表示しています。</p>`;
-  }
-
-  html += `<div class="csv-table-wrap">`;
-  html += `<table class="csv-table">`;
-
-  html += `<thead><tr>`;
-  html += `<th class="csv-row-number">#</th>`;
-
-  for (let columnIndex = 0; columnIndex < maxColumns; columnIndex += 1) {
-    const value = headerRow[columnIndex] ?? "";
-    html += `<th>${escapeHtml(value)}</th>`;
-  }
-
-  html += `</tr></thead>`;
-
-  html += `<tbody>`;
-
-  bodyRows.forEach((row, rowIndex) => {
-    html += `<tr>`;
-    html += `<td class="csv-row-number">${rowIndex + 2}</td>`;
-
-    for (let columnIndex = 0; columnIndex < maxColumns; columnIndex += 1) {
-      const value = row[columnIndex] ?? "";
-      html += `<td>${escapeHtml(value)}</td>`;
-    }
-
-    html += `</tr>`;
-  });
-
-  html += `</tbody>`;
-  html += `</table>`;
-  html += `</div>`;
-
-  csvPreview.innerHTML = html;
+  AppPreviewService.renderCsvPreview();
 }
 
 function updateViewModeButtons() {
@@ -521,6 +370,57 @@ function applyEncodingSettings() {
   saveEncodingSelect.value = settings.saveEncoding;
 }
 
+
+function loadAppSettings() {
+  return AppStorage.loadAppSettings();
+}
+
+function applyEditorSettings(settings) {
+  editor.style.fontSize = `${settings.fontSize}px`;
+  editor.classList.toggle("no-wrap", settings.wordWrap === false);
+}
+
+function applyAppSettings(settings) {
+  csvHeaderCheckbox.checked = settings.csvFirstRowHeader !== false;
+  linkedPreviewCheckbox.checked = settings.linkedPreviewEnabled === true;
+  fontSizeSelect.value = String(settings.fontSize || 15);
+  wordWrapCheckbox.checked = settings.wordWrap !== false;
+  maxTabsSelect.value = String(settings.maxTabs || 5);
+
+  AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
+  AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
+  AppTabs.setMaxTabs(settings.maxTabs);
+  applyEditorSettings(settings);
+}
+
+function saveCurrentAppSettings() {
+  const settings = {
+    csvFirstRowHeader: csvHeaderCheckbox.checked,
+    linkedPreviewEnabled: linkedPreviewCheckbox.checked,
+    fontSize: Number(fontSizeSelect.value) || 15,
+    wordWrap: wordWrapCheckbox.checked,
+    maxTabs: Number(maxTabsSelect.value) || 5
+  };
+
+  if (settings.maxTabs < getTabs().length) {
+    window.alert(`現在${getTabs().length}個のタブがあるため、上限を${settings.maxTabs}に下げられません。`);
+    maxTabsSelect.value = String(AppTabs.getMaxTabs());
+    return;
+  }
+
+  AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
+  AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
+  AppTabs.setMaxTabs(settings.maxTabs);
+  applyEditorSettings(settings);
+  AppStorage.saveAppSettings(settings);
+
+  if (viewMode === "preview") {
+    renderPreview();
+  } else if (viewMode === "csv") {
+    renderCsvPreview();
+  }
+}
+
 function registerServiceWorker() {
   if (!AppEnv.canRegisterServiceWorker) {
     console.info("Service Workerはこの環境では登録されません。");
@@ -564,6 +464,14 @@ AppTabs.init({
   focusEditor
 });
 
+AppPreviewService.init({
+  previewFrame,
+  csvPreview,
+  getActiveTab,
+  getTabs,
+  syncEditorToActiveTab
+});
+
 AppFileService.init({
   fileInput,
   zipInput,
@@ -574,6 +482,7 @@ AppFileService.init({
   zipFileList,
   getActiveTab,
   getTabs,
+  getMaxTabs: AppTabs.getMaxTabs,
   canAddTab,
   createTab,
   syncEditorToActiveTab,
@@ -590,6 +499,7 @@ AppFileService.init({
 function initializeApp() {
   applyTheme(AppStorage.loadTheme());
   applyEncodingSettings();
+  applyAppSettings(loadAppSettings());
 
   const restored = restoreBackupIfNeeded();
 
@@ -609,6 +519,11 @@ themeToggleButton.addEventListener("click", toggleTheme);
 
 openEncodingSelect.addEventListener("change", saveCurrentEncodingSettings);
 saveEncodingSelect.addEventListener("change", saveCurrentEncodingSettings);
+csvHeaderCheckbox.addEventListener("change", saveCurrentAppSettings);
+linkedPreviewCheckbox.addEventListener("change", saveCurrentAppSettings);
+fontSizeSelect.addEventListener("change", saveCurrentAppSettings);
+wordWrapCheckbox.addEventListener("change", saveCurrentAppSettings);
+maxTabsSelect.addEventListener("change", saveCurrentAppSettings);
 
 toggleSearchPanelButton.addEventListener("click", () => {
   setToolPanelMode("search");
@@ -656,6 +571,7 @@ saveButton.addEventListener("click", AppFileService.saveFile);
 saveAsButton.addEventListener("click", AppFileService.saveFileAs);
 
 openZipButton.addEventListener("click", AppFileService.openZipFile);
+extractAllZipButton.addEventListener("click", AppFileService.openAllZipEntriesAsTabs);
 saveZipButton.addEventListener("click", AppFileService.saveTabsAsZip);
 zipInput.addEventListener("change", AppFileService.readSelectedZipFile);
 closeZipPanelButton.addEventListener("click", AppFileService.closeZipPanel);

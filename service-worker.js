@@ -1,4 +1,4 @@
-const CACHE_NAME = "pocket-text-editor-v26";
+const CACHE_NAME = "pocket-text-editor-v27";
 
 const FILES_TO_CACHE = [
   "./",
@@ -8,6 +8,7 @@ const FILES_TO_CACHE = [
   "js/storage-service.js",
   "js/tabs.js",
   "js/editor.js",
+  "js/preview-service.js",
   "js/file-service.js",
   "js/app.js",
   "manifest.json",
@@ -61,4 +62,4 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-/* SERVICE_WORKER_MARKER_EDITOR_SPLIT_V26_2026_06_14 */
+/* SERVICE_WORKER_MARKER_EDITOR_SPLIT_V27_2026_06_14 */
