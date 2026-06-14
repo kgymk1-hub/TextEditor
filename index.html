@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <title>ポケットテキストエディタ</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+
+  <meta name="theme-color" content="#2563eb" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="header-main">
+        <div>
+          <div class="app-title">Pocket Text Editor</div>
+          <div class="file-info">
+            <span id="fileNameLabel" class="file-name">無題</span>
+            <span id="dirtyMark" class="dirty-mark" aria-label="未保存"></span>
+          </div>
+        </div>
+
+        <button
+          id="themeToggleButton"
+          class="theme-toggle-button"
+          type="button"
+          aria-label="ダークモードに切り替え"
+        >
+          暗
+        </button>
+      </div>
+    </header>
+
+    <section class="tabbar" aria-label="開いているファイル">
+      <div id="tabsContainer" class="tabs-container"></div>
+      <button
+        id="addTabButton"
+        class="add-tab-button"
+        type="button"
+        aria-label="新しいタブを追加"
+      >
+        +
+      </button>
+    </section>
+
+    <nav class="toolbar" aria-label="ファイル操作">
+      <button id="newButton" type="button">新規</button>
+      <button id="openButton" type="button">開く</button>
+      <button id="saveButton" type="button">保存</button>
+      <button id="saveAsButton" type="button">別名保存</button>
+    </nav>
+
+    <section class="tool-togglebar" aria-label="ツール切替">
+      <button id="toggleSearchPanelButton" type="button">検索</button>
+      <button id="toggleEncodingPanelButton" type="button">文字コード</button>
+      <button id="toggleZipPanelButton" type="button">ZIP</button>
+    </section>
+
+    <section id="toolPanel" class="tool-panel" hidden>
+      <div id="searchPanel" class="tool-panel-section">
+        <section class="searchbar" aria-label="検索と置換">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="検索キーワード"
+            autocomplete="off"
+            aria-label="検索キーワード"
+          />
+
+          <button id="searchButton" type="button">検索</button>
+
+          <input
+            id="replaceInput"
+            type="text"
+            placeholder="置換後の文字"
+            autocomplete="off"
+            aria-label="置換後の文字"
+          />
+
+          <button id="replaceButton" type="button">置換</button>
+          <button id="replaceAllButton" type="button">すべて置換</button>
+        </section>
+      </div>
+
+      <div id="encodingPanel" class="tool-panel-section">
+        <section class="encodingbar" aria-label="文字コード設定">
+          <label for="openEncodingSelect">読込</label>
+          <select id="openEncodingSelect">
+            <option value="utf-8">UTF-8</option>
+            <option value="shift_jis">Shift_JIS</option>
+          </select>
+
+          <label for="saveEncodingSelect">保存</label>
+          <select id="saveEncodingSelect">
+            <option value="utf-8">UTF-8</option>
+            <option value="utf-8-bom">UTF-8 BOM</option>
+          </select>
+        </section>
+      </div>
+
+      <div id="zipToolPanel" class="tool-panel-section">
+        <section class="zip-actionbar" aria-label="ZIP操作">
+          <button id="openZipButton" type="button">ZIP開く</button>
+          <button id="saveZipButton" type="button">ZIP保存</button>
+        </section>
+
+        <section id="zipPanel" class="zip-panel" aria-label="ZIP内ファイル一覧" hidden>
+          <div class="zip-panel-header">
+            <span id="zipFileNameLabel" class="zip-file-name">ZIP:</span>
+            <button id="closeZipPanelButton" type="button">閉じる</button>
+          </div>
+
+          <div id="zipFileList" class="zip-file-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="viewbar" aria-label="表示切替">
+      <button id="editModeButton" type="button">編集</button>
+      <button id="previewModeButton" type="button">HTML</button>
+      <button id="csvModeButton" type="button">CSV</button>
+      <button id="refreshPreviewButton" type="button">更新</button>
+    </section>
+
+    <input
+      id="fileInput"
+      type="file"
+      hidden
+    />
+
+    <input
+      id="zipInput"
+      type="file"
+      accept=".zip,application/zip"
+      hidden
+    />
+
+    <main class="editor-area">
+      <textarea
+        id="editor"
+        spellcheck="false"
+        placeholder="ここにテキストを入力してください"
+        aria-label="テキスト編集欄"
+      ></textarea>
+
+      <iframe
+        id="previewFrame"
+        class="preview-frame"
+        sandbox=""
+        title="HTMLプレビュー"
+      ></iframe>
+
+      <div
+        id="csvPreview"
+        class="csv-preview"
+        aria-label="CSV表形式表示"
+      ></div>
+    </main>
+
+    <footer class="statusbar">
+      <span id="saveStatus">保存済み</span>
+      <span id="charCount">文字数: 0</span>
+      <span id="lineCount">行数: 1</span>
+      <span id="encodingLabel">UTF-8</span>
+    </footer>
+  </div>
+
+  <script src="libs/jszip.min.js"></script>
+  <script src="js/env.js"></script>
+  <script src="js/storage-service.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/file-service.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- INDEX_HTML_MARKER_EDITOR_SPLIT_2026_06_07 -->
+</body>
+</html>
