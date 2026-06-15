@@ -1,4 +1,4 @@
-const CACHE_NAME = "pocket-text-editor-v32";
+const CACHE_NAME = "pocket-text-editor-v33";
 
 const FILES_TO_CACHE = [
   "./",
