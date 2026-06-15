@@ -41,5 +41,3 @@
     canRegisterServiceWorker
   };
 })();
-
-/* ENV_JS_MARKER_ENV_SPLIT_2026_06_07 */

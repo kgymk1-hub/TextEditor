@@ -370,7 +370,6 @@ function applyEncodingSettings() {
   saveEncodingSelect.value = settings.saveEncoding;
 }
 
-
 function loadAppSettings() {
   return AppStorage.loadAppSettings();
 }
@@ -604,5 +603,3 @@ replaceInput.addEventListener("keydown", (event) => {
 window.addEventListener("beforeunload", handleBeforeUnload);
 
 initializeApp();
-
-/* APP_JS_MARKER_EDITOR_SPLIT_2026_06_07 */

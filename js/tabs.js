@@ -55,6 +55,25 @@
     return true;
   }
 
+  function updateActiveView(shouldFocusEditor = false) {
+    const {
+      renderPreview,
+      renderCsvPreview,
+      getViewMode,
+      focusEditor
+    } = requireDeps();
+
+    const viewMode = getViewMode();
+
+    if (viewMode === "preview") {
+      renderPreview();
+    } else if (viewMode === "csv") {
+      renderCsvPreview();
+    } else if (shouldFocusEditor) {
+      focusEditor();
+    }
+  }
+
   function createTab({
     fileName = "無題",
     text = "",
@@ -68,10 +87,7 @@
       updateEditorFromActiveTab,
       resetSearchPosition,
       updateDisplay,
-      saveBackup,
-      renderPreview,
-      renderCsvPreview,
-      getViewMode
+      saveBackup
     } = requireDeps();
 
     if (!canAddTab()) {
@@ -100,13 +116,7 @@
     resetSearchPosition();
     updateDisplay();
 
-    const viewMode = getViewMode();
-
-    if (viewMode === "preview") {
-      renderPreview();
-    } else if (viewMode === "csv") {
-      renderCsvPreview();
-    }
+    updateActiveView();
 
     if (!skipBackup) {
       saveBackup();
@@ -138,11 +148,7 @@
       updateEditorFromActiveTab,
       resetSearchPosition,
       updateDisplay,
-      saveBackup,
-      renderPreview,
-      renderCsvPreview,
-      getViewMode,
-      focusEditor
+      saveBackup
     } = requireDeps();
 
     if (tabId === activeTabId) {
@@ -162,15 +168,7 @@
     resetSearchPosition();
     updateDisplay();
 
-    const viewMode = getViewMode();
-
-    if (viewMode === "preview") {
-      renderPreview();
-    } else if (viewMode === "csv") {
-      renderCsvPreview();
-    } else {
-      focusEditor();
-    }
+    updateActiveView(true);
 
     saveBackup();
   }
@@ -181,10 +179,7 @@
       updateEditorFromActiveTab,
       resetSearchPosition,
       updateDisplay,
-      saveBackup,
-      renderPreview,
-      renderCsvPreview,
-      getViewMode
+      saveBackup
     } = requireDeps();
 
     syncEditorToActiveTab();
@@ -222,13 +217,7 @@
     resetSearchPosition();
     updateDisplay();
 
-    const viewMode = getViewMode();
-
-    if (viewMode === "preview") {
-      renderPreview();
-    } else if (viewMode === "csv") {
-      renderCsvPreview();
-    }
+    updateActiveView();
 
     saveBackup();
   }
@@ -337,5 +326,3 @@
     restoreTabs
   };
 })();
-
-/* TABS_JS_MARKER_TABS_SPLIT_2026_06_07 */
