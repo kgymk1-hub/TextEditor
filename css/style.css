@@ -212,7 +212,48 @@ body {
   transform: translateY(1px);
 }
 
-/* ファイル操作ボタン */
+/* Toolbars */
+
+.toolbar button,
+.menubar button,
+.zip-actionbar button,
+.searchbar button,
+.zip-file-open-button {
+  font-weight: 600;
+  color: var(--color-button-text);
+  background: var(--color-primary);
+  border: 1px solid var(--color-control-border);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.toolbar button:active,
+.menubar button:active,
+.zip-actionbar button:active,
+.searchbar button:active,
+.zip-file-open-button:active {
+  background: var(--color-primary-hover);
+  transform: translateY(1px);
+}
+
+.searchbar input,
+.encodingbar select,
+.settings-panel select {
+  min-height: 32px;
+  padding: 4px 6px;
+  font-size: 13px;
+  color: var(--color-control-text);
+  background: var(--color-control-bg);
+  border: 1px solid var(--color-control-border);
+  border-radius: 7px;
+}
+
+.searchbar input:focus,
+.encodingbar select:focus {
+  border-color: var(--color-primary-focus);
+  box-shadow: 0 0 0 2px var(--color-primary-focus-ring);
+}
+
 .toolbar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -226,17 +267,6 @@ body {
   min-height: 34px;
   padding: 5px 6px;
   font-size: 13px;
-  font-weight: 600;
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
-  color: var(--color-button-text);
-  background: var(--color-primary);
-  cursor: pointer;
-}
-
-.toolbar button:active {
-  background: var(--color-primary-hover);
-  transform: translateY(1px);
 }
 
 .toolbar button:disabled {
@@ -343,13 +373,6 @@ body {
 
 .encodingbar select {
   min-width: 0;
-  min-height: 32px;
-  padding: 4px 6px;
-  font-size: 13px;
-  color: var(--color-text-strong);
-  background: var(--color-surface);
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
   outline: none;
 }
 
@@ -372,17 +395,6 @@ body {
   min-height: 32px;
   padding: 5px 6px;
   font-size: 13px;
-  font-weight: 600;
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
-  color: var(--color-button-text);
-  background: var(--color-primary);
-  cursor: pointer;
-}
-
-.menubar button:active {
-  background: var(--color-primary-hover);
-  transform: translateY(1px);
 }
 
 /* ZIP操作バー */
@@ -399,17 +411,6 @@ body {
   min-height: 32px;
   padding: 5px 6px;
   font-size: 13px;
-  font-weight: 600;
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
-  color: var(--color-button-text);
-  background: var(--color-primary);
-  cursor: pointer;
-}
-
-.zip-actionbar button:active {
-  background: var(--color-primary-hover);
-  transform: translateY(1px);
 }
 
 /* ZIPパネル */
@@ -490,17 +491,6 @@ body {
   min-height: 28px;
   padding: 4px 8px;
   font-size: 12px;
-  font-weight: 600;
-  color: var(--color-button-text);
-  background: var(--color-primary);
-  border: 1px solid var(--color-primary-hover);
-  border-radius: 7px;
-  cursor: pointer;
-}
-
-.zip-file-open-button:active {
-  background: var(--color-primary-hover);
-  transform: translateY(1px);
 }
 
 .zip-message {
@@ -524,9 +514,6 @@ body {
   min-width: 0;
   min-height: 34px;
   padding: 5px 7px;
-  font-size: 13px;
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
   outline: none;
 }
 
@@ -539,18 +526,7 @@ body {
   min-height: 34px;
   padding: 5px 7px;
   font-size: 12px;
-  font-weight: 600;
   white-space: nowrap;
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
-  color: var(--color-button-text);
-  background: var(--color-primary);
-  cursor: pointer;
-}
-
-.searchbar button:active {
-  background: var(--color-primary-hover);
-  transform: translateY(1px);
 }
 
 #replaceAllButton {
@@ -979,17 +955,15 @@ body.dark-mode .toolbar button,
 body.dark-mode .searchbar button,
 body.dark-mode .menubar button,
 body.dark-mode .zip-actionbar button,
+body.dark-mode .zip-file-open-button,
 body.dark-mode .add-tab-button {
-  background: var(--color-primary);
   border-color: var(--color-primary-border);
 }
 
-body.dark-mode .toolbar button:active,
-body.dark-mode .searchbar button:active,
-body.dark-mode .menubar button:active,
-body.dark-mode .zip-actionbar button:active,
-body.dark-mode .add-tab-button:active {
-  background: var(--color-primary-hover);
+body.dark-mode .searchbar input,
+body.dark-mode .encodingbar select,
+body.dark-mode .settings-panel select {
+  border-color: var(--color-muted);
 }
 
 body.dark-mode .tool-togglebar button {
@@ -1010,17 +984,6 @@ body.dark-mode .tool-togglebar button.active {
 
 body.dark-mode .encodingbar label {
   color: var(--color-muted);
-}
-
-body.dark-mode .encodingbar select {
-  color: var(--color-text);
-  background: var(--color-bg);
-  border-color: var(--color-muted);
-}
-
-body.dark-mode .encodingbar select:focus {
-  border-color: var(--color-primary-focus);
-  box-shadow: 0 0 0 2px var(--color-primary-focus-ring);
 }
 
 body.dark-mode .zip-file-name {
@@ -1049,15 +1012,6 @@ body.dark-mode .zip-panel-header button:active {
   background: var(--color-secondary);
 }
 
-body.dark-mode .zip-file-open-button {
-  background: var(--color-primary);
-  border-color: var(--color-primary-border);
-}
-
-body.dark-mode .zip-file-open-button:active {
-  background: var(--color-primary-hover);
-}
-
 body.dark-mode #replaceAllButton {
   background: var(--color-secondary);
 }
@@ -1066,19 +1020,8 @@ body.dark-mode #replaceAllButton:active {
   background: var(--color-secondary);
 }
 
-body.dark-mode .searchbar input {
-  color: var(--color-text);
-  background: var(--color-bg);
-  border-color: var(--color-muted);
-}
-
 body.dark-mode .searchbar input::placeholder {
   color: var(--color-disabled-text);
-}
-
-body.dark-mode .searchbar input:focus {
-  border-color: var(--color-primary-focus);
-  box-shadow: 0 0 0 2px var(--color-primary-focus-ring);
 }
 
 body.dark-mode .viewbar button {
@@ -1203,16 +1146,6 @@ body.dark-mode .theme-toggle-button:active {
   gap: 6px;
 }
 
-.settings-panel select {
-  min-height: 32px;
-  padding: 4px 6px;
-  font-size: 13px;
-  color: var(--color-text-strong);
-  background: var(--color-surface);
-  border: 1px solid var(--color-control-border);
-  border-radius: 7px;
-}
-
 .save-policy-note {
   grid-column: 1 / -1;
   margin: 0;
@@ -1274,11 +1207,6 @@ body.dark-mode .save-policy-note {
   color: var(--color-muted);
 }
 
-body.dark-mode .settings-panel select {
-  color: var(--color-text);
-  background: var(--color-bg);
-  border-color: var(--color-muted);
-}
 
 .zip-actionbar {
   grid-template-columns: repeat(3, 1fr);

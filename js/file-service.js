@@ -223,6 +223,13 @@
     downloadBlobFile(fileName, blob);
   }
 
+  function markSavedAndRefresh(tab, updateDisplay, saveBackup) {
+    tab.isDirty = false;
+    tab.updatedAt = new Date().toISOString();
+    updateDisplay();
+    saveBackup();
+  }
+
   async function saveFile() {
     const {
       getActiveTab,
@@ -244,11 +251,7 @@
         const saved = await saveToTarget(activeTab);
 
         if (saved) {
-          activeTab.isDirty = false;
-          activeTab.updatedAt = new Date().toISOString();
-
-          updateDisplay();
-          saveBackup();
+          markSavedAndRefresh(activeTab, updateDisplay, saveBackup);
           return;
         }
       } catch (error) {
@@ -261,11 +264,7 @@
     const suggestedName = getSafeFileName(activeTab);
     downloadTextFile(suggestedName, activeTab.text || "");
 
-    activeTab.isDirty = false;
-    activeTab.updatedAt = new Date().toISOString();
-
-    updateDisplay();
-    saveBackup();
+    markSavedAndRefresh(activeTab, updateDisplay, saveBackup);
   }
 
   function getSafeFileName(tab) {
@@ -301,11 +300,7 @@
 
     downloadTextFile(suggestedName, text);
 
-    activeTab.isDirty = false;
-    activeTab.updatedAt = new Date().toISOString();
-
-    updateDisplay();
-    saveBackup();
+    markSavedAndRefresh(activeTab, updateDisplay, saveBackup);
   }
 
   function isJSZipAvailable() {

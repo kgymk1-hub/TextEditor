@@ -15,6 +15,7 @@
   const hasOpenFilePicker =
     "showOpenFilePicker" in window;
 
+  // 将来の保存先選択対応用。現在のDL保存では使用しない。
   const hasSaveFilePicker =
     "showSaveFilePicker" in window;
 
