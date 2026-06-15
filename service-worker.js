@@ -1,4 +1,4 @@
-const CACHE_NAME = "pocket-text-editor-v30";
+const CACHE_NAME = "pocket-text-editor-v31";
 
 const FILES_TO_CACHE = [
   "./",
@@ -51,13 +51,7 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(event.request).then((networkResponse) => {
-        return networkResponse;
-      });
+      return cachedResponse || fetch(event.request);
     })
   );
 });

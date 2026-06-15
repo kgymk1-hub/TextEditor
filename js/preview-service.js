@@ -25,10 +25,6 @@
     linkedPreviewEnabled = value === true;
   }
 
-  function getLinkedPreviewEnabled() {
-    return linkedPreviewEnabled;
-  }
-
   function getFileExtension(fileName) {
     const match = String(fileName || "").toLowerCase().match(/\.([^.\/\\]+)$/);
     return match ? match[1] : "";
@@ -81,6 +77,7 @@
     const isHtmlTab = activeTab && ["html", "htm", ""].includes(getFileExtension(activeTab.fileName));
     const shouldLink = linkedPreviewEnabled && isHtmlTab;
 
+    // 連携プレビュー時のみ JS 実行を許可し、allow-same-origin は付けない。
     previewFrame.setAttribute("sandbox", shouldLink ? "allow-scripts" : "");
     previewFrame.srcdoc = shouldLink ? createLinkedPreviewHtml(html) : (html || getEmptyPreviewHtml());
   }
@@ -201,7 +198,6 @@
     renderPreview,
     renderCsvPreview,
     setCsvFirstRowHeader,
-    setLinkedPreviewEnabled,
-    getLinkedPreviewEnabled
+    setLinkedPreviewEnabled
   };
 })();

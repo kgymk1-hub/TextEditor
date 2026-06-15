@@ -57,6 +57,10 @@
     lastSearchIndex = 0;
   }
 
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   function ensureEditMode() {
     const {
       getViewMode,
@@ -211,7 +215,9 @@
       return;
     }
 
-    const count = text.split(keyword).length - 1;
+    const regex = new RegExp(escapeRegExp(keyword), "g");
+    const matches = text.match(regex);
+    const count = matches ? matches.length : 0;
 
     const confirmed = window.confirm(
       `${count}件の文字列をすべて置換します。よろしいですか？`
@@ -221,7 +227,7 @@
       return;
     }
 
-    editor.value = text.split(keyword).join(replacement);
+    editor.value = text.replace(regex, () => replacement);
 
     resetSearchPosition();
 

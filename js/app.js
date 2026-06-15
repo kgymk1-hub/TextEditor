@@ -243,6 +243,7 @@ function makeBackupTabs() {
     text: tab.text,
     encoding: tab.encoding || "utf-8",
     isDirty: tab.isDirty,
+    // FileSystemFileHandle は localStorage に保存できないため、復元時の保存先は破棄する。
     saveTarget: null,
     createdAt: tab.createdAt,
     updatedAt: tab.updatedAt
@@ -393,6 +394,7 @@ async function copyTextToClipboard(text) {
   temporaryTextarea.style.top = "0";
   temporaryTextarea.style.left = "-9999px";
 
+  // Clipboard API が使えない環境向けのフォールバック。
   document.body.appendChild(temporaryTextarea);
   temporaryTextarea.select();
 
@@ -540,6 +542,7 @@ function updateSymbolBarActive() {
 }
 
 function scheduleSymbolBarActiveUpdate() {
+  // blur 直後は次のフォーカス先が未確定のため、1タスク後に判定する。
   window.setTimeout(updateSymbolBarActive, 0);
 }
 
@@ -558,18 +561,21 @@ function applyEditorSettings(settings) {
   editor.classList.toggle("no-wrap", settings.wordWrap === false);
 }
 
+function applyRuntimeSettings(settings) {
+  AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
+  AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
+  AppTabs.setMaxTabs(settings.maxTabs);
+  applySymbolBarMode(settings.symbolBarMode);
+  applyEditorSettings(settings);
+}
+
 function applyAppSettings(settings) {
   csvHeaderCheckbox.checked = settings.csvFirstRowHeader !== false;
   linkedPreviewCheckbox.checked = settings.linkedPreviewEnabled === true;
   fontSizeSelect.value = String(settings.fontSize || 15);
   wordWrapCheckbox.checked = settings.wordWrap !== false;
   maxTabsSelect.value = String(settings.maxTabs || 5);
-  applySymbolBarMode(settings.symbolBarMode);
-
-  AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
-  AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
-  AppTabs.setMaxTabs(settings.maxTabs);
-  applyEditorSettings(settings);
+  applyRuntimeSettings(settings);
 }
 
 function saveCurrentAppSettings() {
@@ -588,11 +594,7 @@ function saveCurrentAppSettings() {
     return;
   }
 
-  AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
-  AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
-  AppTabs.setMaxTabs(settings.maxTabs);
-  applySymbolBarMode(settings.symbolBarMode);
-  applyEditorSettings(settings);
+  applyRuntimeSettings(settings);
   const saved = AppStorage.saveAppSettings(settings);
 
   if (!saved) {
