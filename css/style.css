@@ -215,7 +215,7 @@ body {
 /* ファイル操作ボタン */
 .toolbar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   padding: 6px 8px;
   background: var(--color-surface);
@@ -244,6 +244,13 @@ body {
   background: var(--color-bg);
   border-color: var(--color-border);
   cursor: not-allowed;
+}
+
+.toolbar button.active {
+  color: var(--color-button-text);
+  background: var(--color-primary);
+  border-color: var(--color-primary-border);
+  box-shadow: 0 0 0 2px var(--color-primary-focus-ring);
 }
 
 /* ツール切替バー */
@@ -293,6 +300,10 @@ body {
   display: none;
 }
 
+.tool-panel.menu-mode #menuPanel {
+  display: block;
+}
+
 .tool-panel.search-mode #searchPanel {
   display: block;
 }
@@ -307,6 +318,7 @@ body {
 
 .tool-panel .encodingbar,
 .tool-panel .searchbar,
+.tool-panel .menubar,
 .tool-panel .zip-panel {
   border-bottom: none;
 }
@@ -344,6 +356,33 @@ body {
 .encodingbar select:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-focus-ring);
+}
+
+/* 追加操作メニュー */
+.menubar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.menubar button {
+  min-height: 32px;
+  padding: 5px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--color-control-border);
+  border-radius: 7px;
+  color: var(--color-button-text);
+  background: var(--color-primary);
+  cursor: pointer;
+}
+
+.menubar button:active {
+  background: var(--color-primary-hover);
+  transform: translateY(1px);
 }
 
 /* ZIP操作バー */
@@ -567,7 +606,7 @@ body {
 }
 
 .symbol-buttonbar {
-  display: flex;
+  display: none;
   flex: 0 0 auto;
   gap: 5px;
   overflow-x: auto;
@@ -575,6 +614,18 @@ body {
   padding: 2px 0 6px;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+}
+
+.app.symbol-bar-always .symbol-buttonbar,
+.app.symbol-bar-focus.symbol-bar-active .symbol-buttonbar {
+  display: flex;
+}
+
+.app.symbol-bar-focus .symbol-buttonbar,
+.app.symbol-bar-hidden .symbol-buttonbar,
+.app.preview-mode .symbol-buttonbar,
+.app.csv-mode .symbol-buttonbar {
+  display: none;
 }
 
 .symbol-buttonbar button {
@@ -642,8 +693,6 @@ body {
   color: var(--color-text-strong);
 }
 
-.app.preview-mode .symbol-buttonbar,
-.app.csv-mode .symbol-buttonbar,
 .app.preview-mode #editor {
   display: none;
 }
@@ -775,11 +824,13 @@ body {
     font-size: 12px;
   }
 
+  .menubar,
   .zip-actionbar {
     gap: 4px;
     padding: 5px 6px;
   }
 
+  .menubar button,
   .zip-actionbar button {
     min-height: 30px;
     padding: 4px 5px;
@@ -895,6 +946,7 @@ body.dark-mode .toolbar,
 body.dark-mode .tool-togglebar,
 body.dark-mode .tool-panel,
 body.dark-mode .encodingbar,
+body.dark-mode .menubar,
 body.dark-mode .zip-actionbar,
 body.dark-mode .zip-panel,
 body.dark-mode .searchbar,
@@ -925,6 +977,7 @@ body.dark-mode .tab-close-button:active {
 
 body.dark-mode .toolbar button,
 body.dark-mode .searchbar button,
+body.dark-mode .menubar button,
 body.dark-mode .zip-actionbar button,
 body.dark-mode .add-tab-button {
   background: var(--color-primary);
@@ -933,6 +986,7 @@ body.dark-mode .add-tab-button {
 
 body.dark-mode .toolbar button:active,
 body.dark-mode .searchbar button:active,
+body.dark-mode .menubar button:active,
 body.dark-mode .zip-actionbar button:active,
 body.dark-mode .add-tab-button:active {
   background: var(--color-primary-hover);
@@ -1231,6 +1285,7 @@ body.dark-mode .settings-panel select {
 }
 
 @media (max-width: 360px) {
+  .menubar,
   .zip-actionbar {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
