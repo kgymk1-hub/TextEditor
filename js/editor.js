@@ -233,6 +233,26 @@
     focusEditor();
   }
 
+  function insertTextAtCursor(text) {
+    const {
+      editor,
+      focusEditor
+    } = requireDeps();
+
+    const selectionStart = editor.selectionStart;
+    const selectionEnd = editor.selectionEnd;
+    const before = editor.value.slice(0, selectionStart);
+    const after = editor.value.slice(selectionEnd);
+
+    editor.value = before + text + after;
+
+    const nextCursorPosition = selectionStart + text.length;
+
+    focusEditor();
+    editor.setSelectionRange(nextCursorPosition, nextCursorPosition);
+    handleEditorInput();
+  }
+
   function handleEditorInput() {
     const {
       editor,
@@ -264,6 +284,7 @@
     searchNext,
     replaceOne,
     replaceAll,
+    insertTextAtCursor,
     handleEditorInput
   };
 })();

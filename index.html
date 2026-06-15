@@ -51,6 +51,8 @@
       <button id="openButton" type="button">開く</button>
       <button id="saveButton" type="button">保存</button>
       <button id="saveAsButton" type="button">DL保存</button>
+      <button id="copyCurrentTabButton" type="button">タブコピー</button>
+      <button id="copyAllTabsButton" type="button">全タブコピー</button>
     </nav>
 
     <section class="tool-togglebar" aria-label="ツール切替">
@@ -167,6 +169,30 @@
     />
 
     <main class="editor-area">
+      <section class="symbol-buttonbar" aria-label="コーディング記号入力">
+        <button type="button" data-insert="  ">Tab</button>
+        <button type="button" data-insert="{">{</button>
+        <button type="button" data-insert="}">}</button>
+        <button type="button" data-insert="[">[</button>
+        <button type="button" data-insert="]">]</button>
+        <button type="button" data-insert="(">(</button>
+        <button type="button" data-insert=")">)</button>
+        <button type="button" data-insert="&lt;">&lt;</button>
+        <button type="button" data-insert="&gt;">&gt;</button>
+        <button type="button" data-insert="&quot;">&quot;</button>
+        <button type="button" data-insert="'">'</button>
+        <button type="button" data-insert="`">`</button>
+        <button type="button" data-insert="/">/</button>
+        <button type="button" data-insert="&#92;">&#92;</button>
+        <button type="button" data-insert="=">=</button>
+        <button type="button" data-insert=";">;</button>
+        <button type="button" data-insert=":">:</button>
+        <button type="button" data-insert=".">.</button>
+        <button type="button" data-insert=",">,</button>
+        <button type="button" data-insert="_">_</button>
+        <button type="button" data-insert="-">-</button>
+      </section>
+
       <textarea
         id="editor"
         spellcheck="false"

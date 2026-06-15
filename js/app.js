@@ -12,6 +12,9 @@ const newButton = document.getElementById("newButton");
 const openButton = document.getElementById("openButton");
 const saveButton = document.getElementById("saveButton");
 const saveAsButton = document.getElementById("saveAsButton");
+const copyCurrentTabButton = document.getElementById("copyCurrentTabButton");
+const copyAllTabsButton = document.getElementById("copyAllTabsButton");
+const symbolButtonbar = document.querySelector(".symbol-buttonbar");
 
 const toolPanel = document.getElementById("toolPanel");
 const searchPanel = document.getElementById("searchPanel");
@@ -355,6 +358,94 @@ function createNewDocument() {
   focusEditor();
 }
 
+function restoreEditorSelection(selectionStart, selectionEnd, shouldFocus = false) {
+  if (shouldFocus) {
+    focusEditor();
+  }
+
+  if (typeof editor.setSelectionRange === "function") {
+    editor.setSelectionRange(selectionStart, selectionEnd);
+  }
+}
+
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const selectionStart = editor.selectionStart;
+  const selectionEnd = editor.selectionEnd;
+  const wasFocused = document.activeElement === editor;
+  const temporaryTextarea = document.createElement("textarea");
+
+  temporaryTextarea.value = text;
+  temporaryTextarea.setAttribute("readonly", "");
+  temporaryTextarea.style.position = "fixed";
+  temporaryTextarea.style.top = "0";
+  temporaryTextarea.style.left = "-9999px";
+
+  document.body.appendChild(temporaryTextarea);
+  temporaryTextarea.select();
+
+  const copied = document.execCommand("copy");
+
+  document.body.removeChild(temporaryTextarea);
+
+  restoreEditorSelection(selectionStart, selectionEnd, wasFocused);
+
+  if (!copied) {
+    throw new Error("クリップボードへコピーできませんでした。");
+  }
+}
+
+async function copyCurrentTab() {
+  syncEditorToActiveTab();
+
+  const activeTab = getActiveTab();
+
+  if (!activeTab) {
+    showStatusWarning("コピーに失敗しました");
+    return;
+  }
+
+  try {
+    await copyTextToClipboard(activeTab.text || "");
+    showStatusWarning("現在タブをコピーしました");
+  } catch (error) {
+    console.warn("現在タブのコピーに失敗しました。", error);
+    showStatusWarning("コピーに失敗しました");
+  }
+}
+
+function buildAllTabsCopyText() {
+  return getTabs()
+    .map((tab) => `===== ${tab.fileName} =====\n${tab.text || ""}`)
+    .join("\n\n");
+}
+
+async function copyAllTabs() {
+  syncEditorToActiveTab();
+
+  try {
+    await copyTextToClipboard(buildAllTabsCopyText());
+    showStatusWarning("全タブを結合してコピーしました");
+  } catch (error) {
+    console.warn("全タブコピーに失敗しました。", error);
+    showStatusWarning("全タブコピーに失敗しました");
+  }
+}
+
+function handleSymbolButtonbarClick(event) {
+  const button = event.target.closest("button[data-insert]");
+
+  if (!button || !symbolButtonbar.contains(button)) {
+    return;
+  }
+
+  AppEditor.insertTextAtCursor(button.dataset.insert);
+}
+
 function handleBeforeUnload(event) {
   syncEditorToActiveTab();
 
@@ -620,6 +711,8 @@ addTabButton.addEventListener("click", createNewDocument);
 openButton.addEventListener("click", AppFileService.openFile);
 saveButton.addEventListener("click", AppFileService.saveFile);
 saveAsButton.addEventListener("click", AppFileService.saveFileAs);
+copyCurrentTabButton.addEventListener("click", copyCurrentTab);
+copyAllTabsButton.addEventListener("click", copyAllTabs);
 
 openZipButton.addEventListener("click", AppFileService.openZipFile);
 extractAllZipButton.addEventListener("click", AppFileService.openAllZipEntriesAsTabs);
@@ -630,6 +723,7 @@ closeZipPanelButton.addEventListener("click", AppFileService.closeZipPanel);
 fileInput.addEventListener("change", AppFileService.readSelectedFile);
 
 editor.addEventListener("input", AppEditor.handleEditorInput);
+symbolButtonbar.addEventListener("click", handleSymbolButtonbarClick);
 
 searchButton.addEventListener("click", () => AppEditor.searchNext());
 replaceButton.addEventListener("click", AppEditor.replaceOne);
