@@ -36,23 +36,38 @@
     return decoder.decode(arrayBuffer);
   }
 
-  async function openFile() {
+  function updateActiveView() {
     const {
-      fileInput,
-      openEncodingSelect,
-      canAddTab,
-      createTab,
       renderPreview,
       renderCsvPreview,
       getViewMode,
       focusEditor
     } = requireDeps();
 
+    const viewMode = getViewMode();
+
+    if (viewMode === "preview") {
+      renderPreview();
+    } else if (viewMode === "csv") {
+      renderCsvPreview();
+    } else {
+      focusEditor();
+    }
+  }
+
+  async function openFile() {
+    const {
+      fileInput,
+      openEncodingSelect,
+      canAddTab,
+      createTab
+    } = requireDeps();
+
     if (!canAddTab()) {
       return;
     }
 
-    if (AppEnv.canUseOpenFilePicker || AppEnv.canUseFileSystemAccess) {
+    if (AppEnv.canUseFileSystemAccess) {
       try {
         const handles = await window.showOpenFilePicker({
           multiple: false,
@@ -83,16 +98,7 @@
           }
         });
 
-        const viewMode = getViewMode();
-
-        if (viewMode === "preview") {
-          renderPreview();
-        } else if (viewMode === "csv") {
-          renderCsvPreview();
-        } else {
-          focusEditor();
-        }
-
+        updateActiveView();
         return;
       } catch (error) {
         if (error.name === "AbortError") {
@@ -114,11 +120,7 @@
     const {
       fileInput,
       openEncodingSelect,
-      createTab,
-      renderPreview,
-      renderCsvPreview,
-      getViewMode,
-      focusEditor
+      createTab
     } = requireDeps();
 
     const file = event.target.files[0];
@@ -139,15 +141,7 @@
         saveTarget: null
       });
 
-      const viewMode = getViewMode();
-
-      if (viewMode === "preview") {
-        renderPreview();
-      } else if (viewMode === "csv") {
-        renderCsvPreview();
-      } else {
-        focusEditor();
-      }
+      updateActiveView();
     } catch (error) {
       console.error(error);
       window.alert("ファイルを読み込めませんでした。");
@@ -409,8 +403,6 @@
       zipPanel,
       zipFileNameLabel,
       zipFileList,
-      getTabs,
-      getMaxTabs,
       setToolPanelMode
     } = requireDeps();
 
@@ -455,11 +447,7 @@
     const {
       openEncodingSelect,
       canAddTab,
-      createTab,
-      renderPreview,
-      renderCsvPreview,
-      getViewMode,
-      focusEditor
+      createTab
     } = requireDeps();
 
     if (!canAddTab()) {
@@ -486,15 +474,7 @@
         saveTarget: null
       });
 
-      const viewMode = getViewMode();
-
-      if (viewMode === "preview") {
-        renderPreview();
-      } else if (viewMode === "csv") {
-        renderCsvPreview();
-      } else {
-        focusEditor();
-      }
+      updateActiveView();
     } catch (error) {
       console.error(error);
       window.alert("ZIP内ファイルを開けませんでした。");
@@ -506,11 +486,7 @@
       openEncodingSelect,
       getTabs,
       getMaxTabs,
-      createTab,
-      renderPreview,
-      renderCsvPreview,
-      getViewMode,
-      focusEditor
+      createTab
     } = requireDeps();
 
     if (!currentZipEntries.length) {
@@ -542,15 +518,7 @@
         });
       }
 
-      const viewMode = getViewMode();
-
-      if (viewMode === "preview") {
-        renderPreview();
-      } else if (viewMode === "csv") {
-        renderCsvPreview();
-      } else {
-        focusEditor();
-      }
+      updateActiveView();
     } catch (error) {
       console.error(error);
       window.alert("ZIP内ファイルの一括展開に失敗しました。");
@@ -691,5 +659,3 @@
     closeZipPanel
   };
 })();
-
-/* FILE_SERVICE_JS_MARKER_FILE_SERVICE_SPLIT_2026_06_07 */

@@ -267,5 +267,3 @@
     handleEditorInput
   };
 })();
-
-/* EDITOR_JS_MARKER_EDITOR_SPLIT_2026_06_07 */
