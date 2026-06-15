@@ -220,6 +220,8 @@ function makeBackupTabs() {
   }));
 }
 
+let backupTimer = null;
+
 function saveBackup() {
   const backupData = {
     tabs: makeBackupTabs(),
@@ -228,6 +230,15 @@ function saveBackup() {
   };
 
   AppStorage.saveTabsBackup(backupData);
+}
+
+function scheduleBackup() {
+  window.clearTimeout(backupTimer);
+
+  backupTimer = window.setTimeout(() => {
+    backupTimer = null;
+    saveBackup();
+  }, 500);
 }
 
 function restoreBackupIfNeeded() {
@@ -444,6 +455,7 @@ AppEditor.init({
   setActiveTabDirty,
   updateDisplay,
   saveBackup,
+  scheduleBackup,
   getViewMode,
   setViewMode,
   focusEditor
