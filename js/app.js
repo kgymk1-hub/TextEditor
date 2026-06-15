@@ -11,12 +11,14 @@ const addTabButton = document.getElementById("addTabButton");
 const newButton = document.getElementById("newButton");
 const openButton = document.getElementById("openButton");
 const saveButton = document.getElementById("saveButton");
+const menuButton = document.getElementById("menuButton");
 const saveAsButton = document.getElementById("saveAsButton");
 const copyCurrentTabButton = document.getElementById("copyCurrentTabButton");
 const copyAllTabsButton = document.getElementById("copyAllTabsButton");
 const symbolButtonbar = document.querySelector(".symbol-buttonbar");
 
 const toolPanel = document.getElementById("toolPanel");
+const menuPanel = document.getElementById("menuPanel");
 const searchPanel = document.getElementById("searchPanel");
 const encodingPanel = document.getElementById("encodingPanel");
 const zipToolPanel = document.getElementById("zipToolPanel");
@@ -64,11 +66,13 @@ const linkedPreviewCheckbox = document.getElementById("linkedPreviewCheckbox");
 const fontSizeSelect = document.getElementById("fontSizeSelect");
 const wordWrapCheckbox = document.getElementById("wordWrapCheckbox");
 const maxTabsSelect = document.getElementById("maxTabsSelect");
+const symbolBarModeSelect = document.getElementById("symbolBarModeSelect");
 
 let viewMode = "edit";
 let toolPanelMode = "none";
 let statusWarningTimer = null;
 let statusWarningMessage = "";
+let isSymbolBarActive = false;
 
 function getNowIsoString() {
   return new Date().toISOString();
@@ -130,11 +134,14 @@ function updateToolPanelDisplay() {
   const isOpen = toolPanelMode !== "none";
 
   toolPanel.hidden = !isOpen;
+  menuPanel.setAttribute("aria-hidden", String(toolPanelMode !== "menu"));
 
+  toolPanel.classList.toggle("menu-mode", toolPanelMode === "menu");
   toolPanel.classList.toggle("search-mode", toolPanelMode === "search");
   toolPanel.classList.toggle("encoding-mode", toolPanelMode === "encoding");
   toolPanel.classList.toggle("zip-mode", toolPanelMode === "zip");
 
+  menuButton.classList.toggle("active", toolPanelMode === "menu");
   toggleSearchPanelButton.classList.toggle("active", toolPanelMode === "search");
   toggleEncodingPanelButton.classList.toggle("active", toolPanelMode === "encoding");
   toggleZipPanelButton.classList.toggle("active", toolPanelMode === "zip");
@@ -147,6 +154,7 @@ function updateToolPanelDisplay() {
 function setToolPanelMode(mode, options = {}) {
   if (
     mode !== "none" &&
+    mode !== "menu" &&
     mode !== "search" &&
     mode !== "encoding" &&
     mode !== "zip"
@@ -512,6 +520,39 @@ function loadAppSettings() {
   return AppStorage.loadAppSettings();
 }
 
+function normalizeSymbolBarMode(value) {
+  return value === "focus" || value === "hidden" ? value : "always";
+}
+
+function isSymbolBarFocused() {
+  const activeElement = document.activeElement;
+
+  return activeElement === editor || symbolButtonbar.contains(activeElement);
+}
+
+function setSymbolBarActive(value) {
+  isSymbolBarActive = value === true;
+  app.classList.toggle("symbol-bar-active", isSymbolBarActive);
+}
+
+function updateSymbolBarActive() {
+  setSymbolBarActive(isSymbolBarFocused());
+}
+
+function scheduleSymbolBarActiveUpdate() {
+  window.setTimeout(updateSymbolBarActive, 0);
+}
+
+function applySymbolBarMode(mode) {
+  const normalizedMode = normalizeSymbolBarMode(mode);
+
+  app.classList.toggle("symbol-bar-always", normalizedMode === "always");
+  app.classList.toggle("symbol-bar-focus", normalizedMode === "focus");
+  app.classList.toggle("symbol-bar-hidden", normalizedMode === "hidden");
+  symbolBarModeSelect.value = normalizedMode;
+  updateSymbolBarActive();
+}
+
 function applyEditorSettings(settings) {
   editor.style.fontSize = `${settings.fontSize}px`;
   editor.classList.toggle("no-wrap", settings.wordWrap === false);
@@ -523,6 +564,7 @@ function applyAppSettings(settings) {
   fontSizeSelect.value = String(settings.fontSize || 15);
   wordWrapCheckbox.checked = settings.wordWrap !== false;
   maxTabsSelect.value = String(settings.maxTabs || 5);
+  applySymbolBarMode(settings.symbolBarMode);
 
   AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
   AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
@@ -536,7 +578,8 @@ function saveCurrentAppSettings() {
     linkedPreviewEnabled: linkedPreviewCheckbox.checked,
     fontSize: Number(fontSizeSelect.value) || 15,
     wordWrap: wordWrapCheckbox.checked,
-    maxTabs: Number(maxTabsSelect.value) || 5
+    maxTabs: Number(maxTabsSelect.value) || 5,
+    symbolBarMode: normalizeSymbolBarMode(symbolBarModeSelect.value)
   };
 
   if (settings.maxTabs < getTabs().length) {
@@ -548,6 +591,7 @@ function saveCurrentAppSettings() {
   AppPreviewService.setCsvFirstRowHeader(settings.csvFirstRowHeader);
   AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
   AppTabs.setMaxTabs(settings.maxTabs);
+  applySymbolBarMode(settings.symbolBarMode);
   applyEditorSettings(settings);
   const saved = AppStorage.saveAppSettings(settings);
 
@@ -666,6 +710,11 @@ linkedPreviewCheckbox.addEventListener("change", saveCurrentAppSettings);
 fontSizeSelect.addEventListener("change", saveCurrentAppSettings);
 wordWrapCheckbox.addEventListener("change", saveCurrentAppSettings);
 maxTabsSelect.addEventListener("change", saveCurrentAppSettings);
+symbolBarModeSelect.addEventListener("change", saveCurrentAppSettings);
+
+menuButton.addEventListener("click", () => {
+  setToolPanelMode("menu");
+});
 
 toggleSearchPanelButton.addEventListener("click", () => {
   setToolPanelMode("search");
@@ -723,7 +772,12 @@ closeZipPanelButton.addEventListener("click", AppFileService.closeZipPanel);
 fileInput.addEventListener("change", AppFileService.readSelectedFile);
 
 editor.addEventListener("input", AppEditor.handleEditorInput);
+editor.addEventListener("focus", () => setSymbolBarActive(true));
+editor.addEventListener("blur", scheduleSymbolBarActiveUpdate);
 symbolButtonbar.addEventListener("click", handleSymbolButtonbarClick);
+symbolButtonbar.addEventListener("pointerdown", () => setSymbolBarActive(true));
+symbolButtonbar.addEventListener("focusin", () => setSymbolBarActive(true));
+symbolButtonbar.addEventListener("focusout", scheduleSymbolBarActiveUpdate);
 
 searchButton.addEventListener("click", () => AppEditor.searchNext());
 replaceButton.addEventListener("click", AppEditor.replaceOne);

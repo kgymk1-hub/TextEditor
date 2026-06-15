@@ -98,7 +98,10 @@
         linkedPreviewEnabled: settings.linkedPreviewEnabled === true,
         fontSize: Number(settings.fontSize) || 15,
         wordWrap: settings.wordWrap !== false,
-        maxTabs: Number(settings.maxTabs) === 10 ? 10 : 5
+        maxTabs: Number(settings.maxTabs) === 10 ? 10 : 5,
+        symbolBarMode: settings.symbolBarMode === "focus" || settings.symbolBarMode === "hidden"
+          ? settings.symbolBarMode
+          : "always"
       };
     } catch (error) {
       console.warn("アプリ設定の読み込みに失敗しました。", error);
@@ -108,7 +111,8 @@
         linkedPreviewEnabled: false,
         fontSize: 15,
         wordWrap: true,
-        maxTabs: 5
+        maxTabs: 5,
+        symbolBarMode: "always"
       };
     }
   }

@@ -50,9 +50,7 @@
       <button id="newButton" type="button">新規</button>
       <button id="openButton" type="button">開く</button>
       <button id="saveButton" type="button">保存</button>
-      <button id="saveAsButton" type="button">DL保存</button>
-      <button id="copyCurrentTabButton" type="button">タブコピー</button>
-      <button id="copyAllTabsButton" type="button">全タブコピー</button>
+      <button id="menuButton" type="button">メニュー</button>
     </nav>
 
     <section class="tool-togglebar" aria-label="ツール切替">
@@ -62,6 +60,14 @@
     </section>
 
     <section id="toolPanel" class="tool-panel" hidden>
+      <div id="menuPanel" class="tool-panel-section">
+        <section class="menubar" aria-label="追加操作">
+          <button id="saveAsButton" type="button">DL保存</button>
+          <button id="copyCurrentTabButton" type="button">タブコピー</button>
+          <button id="copyAllTabsButton" type="button">全タブコピー</button>
+        </section>
+      </div>
+
       <div id="searchPanel" class="tool-panel-section">
         <section class="searchbar" aria-label="検索と置換">
           <input
@@ -125,6 +131,12 @@
           <select id="maxTabsSelect">
             <option value="5">5</option>
             <option value="10">10</option>
+          </select>
+          <label for="symbolBarModeSelect">記号バー</label>
+          <select id="symbolBarModeSelect">
+            <option value="always">常に表示</option>
+            <option value="focus">編集中のみ表示</option>
+            <option value="hidden">非表示</option>
           </select>
           <p class="save-policy-note">保存先を保持できるのは「開く」で開いた既存ファイルのみです。DL保存は保存先を変更しません。</p>
         </section>
