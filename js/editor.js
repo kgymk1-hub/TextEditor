@@ -238,7 +238,7 @@
       editor,
       getActiveTab,
       updateDisplay,
-      saveBackup
+      scheduleBackup
     } = requireDeps();
 
     const activeTab = getActiveTab();
@@ -253,7 +253,7 @@
 
     resetSearchPosition();
     updateDisplay();
-    saveBackup();
+    scheduleBackup();
   }
 
   window.AppEditor = {
