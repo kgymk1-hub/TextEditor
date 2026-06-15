@@ -3,6 +3,7 @@ const app = document.querySelector(".app");
 const fileNameLabel = document.getElementById("fileNameLabel");
 const dirtyMark = document.getElementById("dirtyMark");
 const themeToggleButton = document.getElementById("themeToggleButton");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
 const tabsContainer = document.getElementById("tabsContainer");
 const addTabButton = document.getElementById("addTabButton");
@@ -63,6 +64,8 @@ const maxTabsSelect = document.getElementById("maxTabsSelect");
 
 let viewMode = "edit";
 let toolPanelMode = "none";
+let statusWarningTimer = null;
+let statusWarningMessage = "";
 
 function getNowIsoString() {
   return new Date().toISOString();
@@ -167,13 +170,28 @@ function getEncodingLabel(encoding) {
   return "UTF-8";
 }
 
+function setSaveStatusText(message) {
+  saveStatus.textContent = statusWarningMessage || message;
+}
+
+function showStatusWarning(message) {
+  statusWarningMessage = message;
+  setSaveStatusText(message);
+
+  window.clearTimeout(statusWarningTimer);
+  statusWarningTimer = window.setTimeout(() => {
+    statusWarningMessage = "";
+    updateDisplay();
+  }, 5000);
+}
+
 function updateDisplay() {
   const activeTab = getActiveTab();
 
   if (!activeTab) {
     fileNameLabel.textContent = "無題";
     dirtyMark.textContent = "";
-    saveStatus.textContent = "保存済み";
+    setSaveStatusText("保存済み");
     charCount.textContent = "文字数: 0";
     lineCount.textContent = "行数: 1";
     encodingLabel.textContent = "UTF-8";
@@ -187,11 +205,11 @@ function updateDisplay() {
   const dirtyCount = getTabs().filter((tab) => tab.isDirty).length;
 
   if (dirtyCount === 0) {
-    saveStatus.textContent = "保存済み";
+    setSaveStatusText("保存済み");
   } else if (dirtyCount === 1 && activeTab.isDirty) {
-    saveStatus.textContent = "未保存";
+    setSaveStatusText("未保存");
   } else {
-    saveStatus.textContent = `未保存 ${dirtyCount}件`;
+    setSaveStatusText(`未保存 ${dirtyCount}件`);
   }
 
   const text = editor.value;
@@ -229,8 +247,13 @@ function saveBackup() {
     savedAt: getNowIsoString()
   };
 
-  AppStorage.saveTabsBackup(backupData);
+  const saved = AppStorage.saveTabsBackup(backupData);
+
+  if (!saved) {
+    showStatusWarning("自動バックアップの保存に失敗しました。ファイルサイズが大きすぎる可能性があります。");
+  }
 }
+
 
 function scheduleBackup() {
   window.clearTimeout(backupTimer);
@@ -347,6 +370,11 @@ function applyTheme(theme) {
   const isDarkMode = theme === "dark";
 
   document.body.classList.toggle("dark-mode", isDarkMode);
+
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute("content", isDarkMode ? "#111827" : "#2563eb");
+  }
+
   themeToggleButton.textContent = isDarkMode ? "明" : "暗";
   themeToggleButton.setAttribute(
     "aria-label",
@@ -362,7 +390,11 @@ function toggleTheme() {
   const nextTheme = currentTheme === "dark" ? "light" : "dark";
 
   applyTheme(nextTheme);
-  AppStorage.saveTheme(nextTheme);
+  const saved = AppStorage.saveTheme(nextTheme);
+
+  if (!saved) {
+    showStatusWarning("テーマ設定の保存に失敗しました");
+  }
 }
 
 function saveCurrentEncodingSettings() {
@@ -371,7 +403,11 @@ function saveCurrentEncodingSettings() {
     saveEncoding: saveEncodingSelect.value
   };
 
-  AppStorage.saveEncodingSettings(settings);
+  const saved = AppStorage.saveEncodingSettings(settings);
+
+  if (!saved) {
+    showStatusWarning("文字コード設定の保存に失敗しました");
+  }
 }
 
 function applyEncodingSettings() {
@@ -422,7 +458,11 @@ function saveCurrentAppSettings() {
   AppPreviewService.setLinkedPreviewEnabled(settings.linkedPreviewEnabled);
   AppTabs.setMaxTabs(settings.maxTabs);
   applyEditorSettings(settings);
-  AppStorage.saveAppSettings(settings);
+  const saved = AppStorage.saveAppSettings(settings);
+
+  if (!saved) {
+    showStatusWarning("アプリ設定の保存に失敗しました");
+  }
 
   if (viewMode === "preview") {
     renderPreview();
